@@ -9,11 +9,55 @@
 int main(void){
 	struct Cell world[ROW][COL];
 	struct Cell lworld[ROW][COL];
-	
-	genWorld(world, lworld);
 	setRawMode();
 
+	genWorld(world, lworld);
 	drawFull(world);
+
+	while (true){
+		int move2[2] = {0, 0};
+		char c = getChar();
+		switch (c){
+
+			case 3:
+				setNormalMode();
+				return 0;
+
+			case 'w':
+				move2[1]--;
+				break;
+			case 's':
+				move2[1]++;
+				break;
+			case 'd':
+				move2[0]++;
+				break;
+			case 'a':
+				move2[0]--;
+				break;
+	
+			case ' ':
+				genMines(world);
+				genNear(world);
+				revealCell(world, & world[cursor[1]][cursor[0]]);
+				break;
+			case '\r':
+				world[cursor[1]][cursor[0]].isFlag = (
+					!world[cursor[1]][cursor[0]].isFlag
+				);
+				break;
+
+			default:
+				continue;
+		}
+		moveCursor(move2, world);
+		draw(world, lworld);
+		
+		if (!gameOver)
+			break;
+	}
+	
+
 	while (true){	
 		char c = getChar();
 		int move2[2] = {0, 0};

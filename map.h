@@ -20,7 +20,7 @@ char* getColor(struct Cell cell){
 
 	if (!cell.isOpen){
 		if (!cell.isFlag)
-			return "\x1b[0m";
+			return "\x1b[30;40m";
 		return "\x1b[102;30m";
 	}
 
@@ -33,7 +33,7 @@ char* getColor(struct Cell cell){
 
 	switch (cell.near){
 		case 0:
-			return "\x1b[0m";
+			return "\x1b[37;47m";
 		case 1:
 			return "\x1b[104;30m";
 		case 2:
