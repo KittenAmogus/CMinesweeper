@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "game.h"
 
 #ifndef MAP_H
 #define MAP_H
@@ -44,6 +45,10 @@ char* getColor(struct Cell cell){
 
 char* getString(struct Cell cell){
 	char str[3] = " @ ";
+	if (cursor[0] == cell.x && cursor[1] == cell.y){
+		str[0] = '[';
+		str[2] = ']';
+	}
 	if (!cell.isOpen){
 		if (cell.isFlag)
 			str[1] = 'F';
@@ -96,7 +101,7 @@ char* getString(struct Cell cell){
 void genMap(struct Cell map[ROW][COL], struct Cell lmap[ROW][COL]){
 		for (int y=0; y<ROW; y++){
 			for (int x=0; x<COL; x++){
-				struct Cell cell = {false, false, false, 0};
+				struct Cell cell = {false, false, false, 0, x, y};
 				map[y][x] = cell;
 				lmap[y][x] = cell;
 			}
@@ -144,16 +149,17 @@ void draw(struct Cell map[ROW][COL], struct Cell lmap[ROW][COL]){
 	for (int y=0; y<ROW; y++){
 		for (int x=0; x<COL; x++){
 			if (
-					map[y][x].isFlag != lmap[y][x].isFlag |
-					map[y][x].isOpen != lmap[y][x].isOpen
+					map[y][x].isFlag != lmap[y][x].isFlag ||
+					map[y][x].isOpen != lmap[y][x].isOpen ||
+					(cursor[0] == x && cursor[1] == y) ||
+					(lcursor[0] == x && lcursor[1] == y)
 							){
-				printf("\x1b[%d;%dH", 2 + (y * 2), (x * 4) + 3);
-				printf("%s%s", getColor(map[y][x]), getString(map[y][x]));
+				printf("\x1b[%d;%dH", 2 + (y * 2), (x * 4) + 2);
+				printf("%s%s\x1b[0m", getColor(map[y][x]), getString(map[y][x]));
 			}
 		}
 	}
-	printf("\x1b[0m\x1b[%d;%dH", (ROW * 2) + 1, 1);
-	fflush(stdin);
+	printf("\x1b[0m\x1b[%d;%dH\n\r", (ROW * 2) + 1, 1);
 }
 
 

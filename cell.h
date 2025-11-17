@@ -7,6 +7,9 @@ struct Cell{
 	bool isFlag;
 	bool isMine;
 	int near;
+
+	int x;
+	int y;
 };
 
 
