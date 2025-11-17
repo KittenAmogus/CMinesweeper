@@ -9,48 +9,47 @@
 int main(void){
 	struct Cell world[ROW][COL];
 	struct Cell lworld[ROW][COL];
-
-	genMap(world, lworld);
-
-	for (int x=0; x<COL; x++){
-		world[0][x].near = x;
-	}
-	world[1][1].isFlag = true;
-	world[1][2].isMine = true;
-	world[1][3].isMine = true;
-
-	setRawMode();
 	
-	draw_one(world);
+	genWorld(world, lworld);
+	setRawMode();
 
-	while (true){
+	drawFull(world);
+	while (true){	
 		char c = getChar();
 		int move2[2] = {0, 0};
 		switch (c){
-			case 'a':
-				move2[0]--;
-				break;
-			case 'd':
-				move2[0]++;
-				break;
+
+			case 3:
+				setNormalMode();
+				return 0;
+
 			case 'w':
 				move2[1]--;
 				break;
 			case 's':
 				move2[1]++;
 				break;
-			case ' ':
-				world[cursor[1]][cursor[0]].isOpen = true;
+			case 'd':
+				move2[0]++;
 				break;
-			default:
-				draw_one(world);
-				setNormalMode();
-				return 0;
+			case 'a':
+				move2[0]--;
+				break;
+	
+			case ' ':
+				revealCell(world, & world[cursor[1]][cursor[0]]);
+				break;
+			case '\r':
+				world[cursor[1]][cursor[0]].isFlag = (
+					!world[cursor[1]][cursor[0]].isFlag
+				);
+				break;
 		}
-		moveCursor(move2);
+		moveCursor(move2, world);
 		draw(world, lworld);
+		// draw(world, lworld);
 	}
-
+	
 	setNormalMode();
 	return 0;
 }
