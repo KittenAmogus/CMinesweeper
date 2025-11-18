@@ -37,9 +37,31 @@ int main(void){
 				break;
 	
 			case ' ':
-				genMines(world);
+				int repeats = 0;
+				while (!genMines(world) && repeats++ < 4){
+					for (int x=0; x<COL; x++){
+						for (int y=0; y<ROW; y++){
+							world[y][x].isMine = false;
+						}
+					}
+				};
+
+				if (repeats >= 4){
+					setNormalMode();
+					printf("\x1b[0mError mines generation!\n\r");
+					printf("Maybe [%d] is too big\n\r", MINES);
+					return 1;
+				}
+
 				genNear(world);
-				revealCell(world, & world[cursor[1]][cursor[0]]);
+				
+				if (revealCell(world, &world[cursor[1]][cursor[0]])){
+					drawFull(world);
+					gameOverFunc(world);
+					setNormalMode();
+					return 0;
+				}
+				
 				break;
 			case '\r':
 				world[cursor[1]][cursor[0]].isFlag = (
@@ -81,7 +103,12 @@ int main(void){
 				break;
 	
 			case ' ':
-				revealCell(world, & world[cursor[1]][cursor[0]]);
+				if (revealCell(world, &world[cursor[1]][cursor[0]])){
+					drawFull(world);
+					gameOverFunc(world);
+					setNormalMode();
+					return 0;
+				}
 				break;
 			case '\r':
 				world[cursor[1]][cursor[0]].isFlag = (

@@ -14,7 +14,7 @@ bool win = false;
 
 
 
-void genMines(struct Cell map[ROW][COL]){
+bool genMines(struct Cell map[ROW][COL]){
 	srand(time(NULL));
 	int indices[ROW * COL];
     for (int i = 0; i < ROW * COL; i++) {
@@ -36,12 +36,15 @@ void genMines(struct Cell map[ROW][COL]){
 		if (row == cursor[1] && col == cursor[0]){
 			repeats++;
 			k--;
-			printf("Repeats: %d\n\r", repeats);
+			if (repeats > 5){
+				return false;
+			}
 			continue;
 		}
 		map[row][col].isMine = true;
     }
 	gameOver = false;
+	return true;
 }
 
 
@@ -153,6 +156,11 @@ bool revealCell(struct Cell map[ROW][COL], struct Cell *cell){
 	revealNearCells(map, cell);
 
 	return cell->isMine;
+}
+
+
+void gameOverFunc(struct Cell map[ROW][COL]){
+	printf("\x1b[1;91mGame Over [%b]\x1b[0m\n\r", win);
 }
 
 
