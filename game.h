@@ -13,12 +13,6 @@ bool gameOver = true;
 bool win = false;
 
 
-int randint(int lb, int ub){
-	srand(time(NULL));
-	int randomNum = rand() % (ub - lb) + lb;
-	return randomNum;
-}
-
 
 void genMines(struct Cell map[ROW][COL]){
 	srand(time(NULL));
@@ -34,12 +28,15 @@ void genMines(struct Cell map[ROW][COL]){
         indices[j] = temp;
     }
 
+	int repeats = 0;
     for (int k = 0; k < MINES; k++) {
         int selected_1d_index = indices[k];
         int row = selected_1d_index / COL;
         int col = selected_1d_index % COL;
 		if (row == cursor[1] && col == cursor[0]){
+			repeats++;
 			k--;
+			printf("Repeats: %d\n\r", repeats);
 			continue;
 		}
 		map[row][col].isMine = true;
@@ -98,6 +95,48 @@ void moveCursor(int moveOn[2], struct Cell map[ROW][COL]){
 	}*/
 }
 
+void revealNearCells(struct Cell map[ROW][COL],
+				struct Cell *initialCell){
+	if (initialCell == NULL || initialCell->isMine)
+		return;
+
+	struct Cell *queue[ROW * COL];
+	int head = 0;
+	int tail = 0;
+	queue[tail++] = initialCell;
+
+	while (head < tail){
+		struct Cell *cell = queue[head++];
+
+		if (cell == NULL || cell->isOpen)
+			continue;
+
+		if (!cell->isFlag)
+			cell->isOpen = true;
+
+		if (cell->near > 0)
+			continue;
+
+		for (int dy = -1; dy <= 1; dy++){
+			for (int dx = -1; dx <= 1; dx++){
+				if (dx == 0 && dy == 0)
+					continue;
+
+				int ny = cell->y + dy;
+				int nx = cell->x + dx;
+				if (ny < 1 || ny >= ROW || nx < 0 || nx >= COL)
+					continue;
+
+				struct Cell *nb = &map[ny][nx];
+
+				if (tail + 1 < ROW * COL + 8 && !nb->isMine && !nb->isFlag && !nb->isOpen){
+					queue[tail++] = nb;
+					// nb->isOpen = true;
+				}
+			}
+		}
+	}
+}
 
 bool revealCell(struct Cell map[ROW][COL], struct Cell *cell){
 	int x = cell->x;
@@ -105,9 +144,13 @@ bool revealCell(struct Cell map[ROW][COL], struct Cell *cell){
 	if (cell->isFlag || cell->isOpen)
 		return false;
 
-	cell->isOpen = true;
+	if (cell->isMine){
+		cell->isOpen = true;
+		return true;
+	}
+	// cell->isOpen = true;
 
-	// revealNearCells(map, x, y);
+	revealNearCells(map, cell);
 
 	return cell->isMine;
 }

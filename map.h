@@ -21,7 +21,7 @@ char* getColor(struct Cell cell){
 	if (!cell.isOpen){
 		if (!cell.isFlag)
 			return "\x1b[30;40m";
-		return "\x1b[102;30m";
+		return "\x1b[103;30m";
 	}
 
 	if (cell.isMine){
