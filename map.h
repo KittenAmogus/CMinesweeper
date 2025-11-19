@@ -18,11 +18,24 @@ char* getColor(struct Cell cell){
 	if (cursor[0] == cell.x && cursor[1] == cell.y)
 		return "\x1b[93;1m";
 
+	if (gameOver){
+		if (cell.isFlag && cell.isMine && cell.isOpen){  // if is open by gameOverFunc
+			return "\x1b[103;30m";
+		}
+		else if (cell.isFlag && !cell.isMine){
+			return "\x1b[91;1m";
+		}
+	}
+
 	if (!cell.isOpen){
 		if (!cell.isFlag)
 			return "\x1b[30;40m";
-		return "\x1b[103;30m";
+		if (gameOver)
+			return "\x1b[92;1m";
+		else
+			return "\x1b[103;30m";
 	}
+	
 
 	if (cell.isMine){
 		if (gameOver){
@@ -33,7 +46,7 @@ char* getColor(struct Cell cell){
 
 	switch (cell.near){
 		case 0:
-			return "\x1b[37;47m";
+			return "";
 		case 1:
 			return "\x1b[104;30m";
 		case 2:
@@ -51,7 +64,7 @@ char* getColor(struct Cell cell){
 		case 8:
 			return "\x1b[100;30m";
 		default:
-			return "";
+			return "\x1b[0m";
 	}
 }
 
@@ -62,6 +75,17 @@ void printString(struct Cell cell){
 		str[0] = '[';
 		str[2] = ']';
 	}
+
+
+	if (gameOver){
+		if (cell.isFlag && cell.isMine){
+			printf(" F "); return;
+		}
+		else if (cell.isFlag && !cell.isMine){
+			printf(" X "); return;
+		}
+	}
+
 	if (!cell.isOpen){
 		if (cell.isFlag)
 			str[1] = 'F';
@@ -71,6 +95,12 @@ void printString(struct Cell cell){
 		printf(strp);
 		return;
 	}
+
+	if (cell.isFlag){
+		printf(" F ");
+		return;
+	}
+
 	if (!cell.isMine){
 		if (cell.near > 0)
 			str[1] = (char)(48 + cell.near);

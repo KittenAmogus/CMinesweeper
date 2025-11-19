@@ -104,8 +104,9 @@ int main(void){
 	
 			case ' ':
 				if (revealCell(world, &world[cursor[1]][cursor[0]])){
-					drawFull(world);
+					gameOver = true;
 					gameOverFunc(world);
+					draw(world, lworld);
 					setNormalMode();
 					return 0;
 				}

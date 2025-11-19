@@ -127,12 +127,12 @@ void revealNearCells(struct Cell map[ROW][COL],
 
 				int ny = cell->y + dy;
 				int nx = cell->x + dx;
-				if (ny < 1 || ny >= ROW || nx < 0 || nx >= COL)
+				if (ny < 0 || ny >= ROW || nx < 0 || nx >= COL)
 					continue;
 
 				struct Cell *nb = &map[ny][nx];
 
-				if (tail + 1 < ROW * COL + 8 && !nb->isMine && !nb->isFlag && !nb->isOpen){
+				if (tail < ROW * COL && tail + 1 < ROW * COL + 8 && !nb->isMine && !nb->isFlag && !nb->isOpen){
 					queue[tail++] = nb;
 					// nb->isOpen = true;
 				}
@@ -160,7 +160,14 @@ bool revealCell(struct Cell map[ROW][COL], struct Cell *cell){
 
 
 void gameOverFunc(struct Cell map[ROW][COL]){
-	printf("\x1b[1;91mGame Over [%b]\x1b[0m\n\r", win);
+	for (int x=0; x<COL; x++){
+		for (int y=0; y<ROW; y++){
+			if (map[y][x].isMine){
+				struct Cell *cell = &map[y][x];
+				cell->isOpen = true;
+			}
+		}
+	}
 }
 
 
